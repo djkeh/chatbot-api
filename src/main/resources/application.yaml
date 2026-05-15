@@ -1,6 +1,33 @@
 spring:
   application:
     name: chatbot-api
+  datasource:
+    url: jdbc:h2:mem:chatbotdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      api-key: "dummy-key"
+jwt:
+  secret: "vms987654321vms987654321vms987654321vms987654321vms987654321"
+  access-token-expiration-ms: 300000
+  refresh-token-expiration-ms: 86400000
+logging:
+  level:
+    me.uno.chatbotapi: DEBUG
+    org.springframework.security: DEBUG
