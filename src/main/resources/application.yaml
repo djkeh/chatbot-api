@@ -1,6 +1,26 @@
+logging:
+  level:
+    me.uno.chatbotapi: DEBUG
+    org.springframework.test.context.transaction.TransactionContext: DEBUG
+
 spring:
   application:
     name: chatbot-api
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+  jpa:
+    defer-datasource-initialization: true
+    hibernate.ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql.init.mode: always
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      api-key: ${OPENAI_API_KEY:dummy-key}
+
+jwt:
+  secret: ${JWT_SECRET:vms987654321vms987654321vms987654321vms987654321vms987654321}
+  access-token-expiration: 5m
+  refresh-token-expiration: 1d

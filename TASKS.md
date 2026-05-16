@@ -4,21 +4,21 @@
 
 ## Phase 1. 프로젝트 기초 설정 및 사용자 인증 (Auth)
 
-- [ ] **프로젝트 초기화**
-    - [ ] `build.gradle.kts` 의존성 추가 (Spring Security, springmockk, JPA, H2, Validation, kotlin-logging)
-    - [ ] 패키지 구조 생성 (`application`, `domain`, `adapter.in`, `adapter.out`)
-    - [ ] `application.yaml`: SQL 초기화 프로퍼티 설정 (`defer-datasource-initialization: true` 등)
-- [ ] **사용자 도메인 및 초기 데이터**
-    - [ ] `User` 엔티티 및 `UserRole` 열거형 정의 (Default: MEMBER)
-    - [ ] `src/main/resources/data.sql`: 관리자 계정 및 기본 데이터 작성
-    - [ ] 패스워드 암호화 로직 (`DelegatingPasswordEncoder`) 적용
-- [ ] **보안 체계 구축**
-    - [ ] JWT Provider (생성-Access 5m/Refresh 24h, 검증, 파싱) 구현
-    - [ ] `SecurityFilter` 및 `AuthenticationEntryPoint` 설정
-- [ ] **인증 API 구현**
-    - [ ] `POST /api/v1/auth/signup`: 회원가입 기능 (TDD)
-    - [ ] `POST /api/v1/auth/login`: 로그인 및 토큰 발급 (TDD)
-    - [ ] `POST /api/v1/auth/refresh`: 토큰 재생성 기능 (TDD)
+- [x] **프로젝트 초기화**
+    - [x] `build.gradle.kts` 의존성 추가 (Spring Security, springmockk, JPA, H2, Validation, kotlin-logging)
+    - [x] 패키지 구조 생성 (`application`, `domain`, `adapter.inbound`, `adapter.outbound`, `config`)
+    - [x] `application.yaml`: SQL 초기화 프로퍼티 설정 (`defer-datasource-initialization: true` 등)
+- [x] **사용자 도메인 및 초기 데이터**
+    - [x] `User` 엔티티 및 `UserRole` 열거형 정의 (Default: MEMBER)
+    - [x] `src/main/resources/data.sql`: 관리자 계정 및 기본 데이터 작성
+    - [x] 패스워드 암호화 로직 (`DelegatingPasswordEncoder`) 적용
+- [x] **보안 체계 구축**
+    - [x] JWT Provider (생성-Access 5m/Refresh 24h, 검증, 파싱) 구현
+    - [x] `SecurityFilter` 및 `AuthenticationEntryPoint` 설정
+- [x] **인증 API 구현**
+    - [x] `POST /api/v1/auth/signup`: 회원가입 기능 (TDD)
+    - [x] `POST /api/v1/auth/login`: 로그인 및 토큰 발급 (TDD)
+    - [x] `POST /api/v1/auth/refresh`: 토큰 재생성 기능 (TDD)
 
 ## Phase 2. 대화 관리 기능 (Chat & Thread)
 

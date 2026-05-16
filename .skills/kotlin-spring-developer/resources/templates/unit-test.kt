@@ -26,8 +26,28 @@ class ExampleServiceTest(
         verify {
             dependencyPort1.doSomething(input)
             dependencyPort2.doSomething(any())
+            unusedPort wasNot Called
         }
-        verify { unusedPort wasNot Called }
+    }
+
+    @Test
+    fun `잘못된 입력값이 주어지면, 예외를 던진다`() {
+        // given
+        val invalidInput = "wrong-input"
+        every { dependencyPort1.doSomething(invalidInput) } throws IllegalArgumentException("잘못된 입력값입니다.")
+
+        // when
+        val t = catchThrowable { sut.execute(invalidInput) }
+
+        // then
+        assertThat(t)
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("잘못된 입력값입니다.")
+        verify {
+            dependencyPort1.doSomething(invalidInput)
+            dependencyPort2 wasNot Called
+            unusedPort wasNot Called
+        }
     }
 
 }

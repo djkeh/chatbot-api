@@ -22,14 +22,14 @@
 - `password`: String (Encoded)
 - `name`: String
 - `role`: UserRole (MEMBER, ADMIN)
-- `createdAt`: LocalDateTime (OffsetDateTime)
+- `createdAt`: OffsetDateTime
 
 ### 3.2 스레드 (Thread)
 
 - `id`: UUID (Primary Key)
 - `userId`: Long (Foreign Key)
-- `createdAt`: LocalDateTime
-- `lastActivityAt`: LocalDateTime (스레드 유지 시간 판단 기준)
+- `createdAt`: OffsetDateTime
+- `lastActivityAt`: OffsetDateTime (스레드 유지 시간 판단 기준)
 
 ### 3.3 대화 (Chat)
 
@@ -38,7 +38,7 @@
 - `question`: String (텍스트)
 - `answer`: String (AI 생성 답변)
 - `model`: String (OpenAI 모델 명)
-- `createdAt`: LocalDateTime
+- `createdAt`: OffsetDateTime
 
 ### 3.4 피드백 (Feedback)
 
@@ -47,8 +47,8 @@
 - `chatId`: UUID (Foreign Key)
 - `isPositive`: Boolean
 - `status`: FeedbackStatus (PENDING, RESOLVED)
-- `createdAt`: LocalDateTime (OffsetDateTime)
-- `updatedAt`: LocalDateTime (OffsetDateTime)
+- `createdAt`: OffsetDateTime
+- `updatedAt`: OffsetDateTime
 
 ## 4. API 목록
 

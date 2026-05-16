@@ -11,9 +11,10 @@ class ExampleControllerTest @Autowired constructor(
         every { exampleUseCase.execute(any()) } returns ExampleResponse(data = "success")
 
         // when & then
-        assertThat(mockMvc.get()
-            .uri("/api/example")
-            .contentType(MediaType.APPLICATION_JSON)
+        assertThat(
+            mockMvc.get()
+                .uri("/api/example")
+                .contentType(MediaType.APPLICATION_JSON)
         )
             .hasStatusOk()
             .hasContentType(MediaType.APPLICATION_JSON)
