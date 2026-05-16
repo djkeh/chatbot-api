@@ -6,7 +6,7 @@
 
 - [x] **프로젝트 초기화**
     - [x] `build.gradle.kts` 의존성 추가 (Spring Security, springmockk, JPA, H2, Validation, kotlin-logging)
-    - [x] 패키지 구조 생성 (`application`, `domain`, `adapter.in`, `adapter.out`)
+    - [x] 패키지 구조 생성 (`application`, `domain`, `adapter.inbound`, `adapter.outbound`, `config`)
     - [x] `application.yaml`: SQL 초기화 프로퍼티 설정 (`defer-datasource-initialization: true` 등)
 - [x] **사용자 도메인 및 초기 데이터**
     - [x] `User` 엔티티 및 `UserRole` 열거형 정의 (Default: MEMBER)

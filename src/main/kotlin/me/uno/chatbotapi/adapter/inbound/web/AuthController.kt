@@ -1,9 +1,9 @@
 package me.uno.chatbotapi.adapter.inbound.web
 
 import me.uno.chatbotapi.adapter.inbound.web.dto.*
-import me.uno.chatbotapi.application.port.`in`.LoginUseCase
-import me.uno.chatbotapi.application.port.`in`.SignupUseCase
-import me.uno.chatbotapi.application.port.`in`.TokenRefreshUseCase
+import me.uno.chatbotapi.application.port.inbound.LoginUseCase
+import me.uno.chatbotapi.application.port.inbound.SignupUseCase
+import me.uno.chatbotapi.application.port.inbound.TokenRefreshUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,5 +32,5 @@ class AuthController(
     fun refresh(@RequestBody request: RefreshRequest): ResponseEntity<LoginResponse> {
         return ResponseEntity.ok(tokenRefreshUseCase.refresh(request))
     }
-}
 
+}

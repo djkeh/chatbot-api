@@ -32,4 +32,3 @@ data class LoginResponse(
 data class RefreshRequest(
     val refreshToken: String,
 )
-

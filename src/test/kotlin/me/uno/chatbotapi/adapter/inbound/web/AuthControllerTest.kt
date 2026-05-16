@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import me.uno.chatbotapi.adapter.inbound.web.dto.*
-import me.uno.chatbotapi.application.port.`in`.LoginUseCase
-import me.uno.chatbotapi.application.port.`in`.SignupUseCase
-import me.uno.chatbotapi.application.port.`in`.TokenRefreshUseCase
-import me.uno.chatbotapi.common.security.JwtAuthenticationFilter
-import me.uno.chatbotapi.common.security.JwtProvider
+import me.uno.chatbotapi.application.port.inbound.LoginUseCase
+import me.uno.chatbotapi.application.port.inbound.SignupUseCase
+import me.uno.chatbotapi.application.port.inbound.TokenRefreshUseCase
+import me.uno.chatbotapi.config.security.JwtProvider
 import me.uno.chatbotapi.domain.UserRole
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -81,6 +80,5 @@ class AuthControllerTest {
             .andExpect(jsonPath("$.accessToken").value("access"))
             .andExpect(jsonPath("$.refreshToken").value("refresh"))
     }
+
 }
-
-

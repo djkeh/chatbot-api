@@ -1,15 +1,15 @@
 package me.uno.chatbotapi.application.service
 
 import me.uno.chatbotapi.adapter.inbound.web.dto.*
-import me.uno.chatbotapi.application.port.`in`.LoginUseCase
-import me.uno.chatbotapi.application.port.`in`.SignupUseCase
-import me.uno.chatbotapi.application.port.`in`.TokenRefreshUseCase
-import me.uno.chatbotapi.application.port.out.LoadUserPort
-import me.uno.chatbotapi.application.port.out.SaveUserPort
-import me.uno.chatbotapi.common.security.JwtProvider
-import me.uno.chatbotapi.domain.User
+import me.uno.chatbotapi.application.port.inbound.LoginUseCase
+import me.uno.chatbotapi.application.port.inbound.SignupUseCase
+import me.uno.chatbotapi.application.port.inbound.TokenRefreshUseCase
+import me.uno.chatbotapi.application.port.outbound.LoadUserPort
+import me.uno.chatbotapi.application.port.outbound.SaveUserPort
+import me.uno.chatbotapi.config.security.JwtProperties
+import me.uno.chatbotapi.config.security.JwtProvider
+import me.uno.chatbotapi.domain.UserAccount
 import me.uno.chatbotapi.domain.UserRole
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,8 +22,7 @@ class AuthService(
     private val saveUserPort: SaveUserPort,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
-    @Value("\${jwt.access-token-expiration-ms}") private val accessTokenExpirationMs: Long = 300_000,
-    @Value("\${jwt.refresh-token-expiration-ms}") private val refreshTokenExpirationMs: Long = 86_400_000,
+    private val jwtProperties: JwtProperties,
 ) : SignupUseCase, LoginUseCase, TokenRefreshUseCase {
 
     override fun signup(request: SignupRequest): SignupResponse {
@@ -31,7 +30,7 @@ class AuthService(
             throw IllegalArgumentException("Already registered email")
         }
 
-        val user = User(
+        val userAccount = UserAccount(
             email = request.email,
             password = passwordEncoder.encode(request.password),
             name = request.name,
@@ -39,7 +38,7 @@ class AuthService(
             createdAt = OffsetDateTime.now(),
         )
 
-        val savedUser = saveUserPort.saveUser(user)
+        val savedUser = saveUserPort.saveUser(userAccount)
 
         return SignupResponse(
             email = savedUser.email,
@@ -73,15 +72,16 @@ class AuthService(
         return createLoginResponse(user)
     }
 
-    private fun createLoginResponse(user: User): LoginResponse {
-        val accessToken = jwtProvider.createAccessToken(user.email, user.role)
-        val refreshToken = jwtProvider.createRefreshToken(user.email, user.role)
+    private fun createLoginResponse(userAccount: UserAccount): LoginResponse {
+        val accessToken = jwtProvider.createAccessToken(userAccount.email, userAccount.role)
+        val refreshToken = jwtProvider.createRefreshToken(userAccount.email, userAccount.role)
 
         return LoginResponse(
             accessToken = accessToken,
             refreshToken = refreshToken,
-            expiresIn = accessTokenExpirationMs / 1000,
-            refreshExpiresIn = refreshTokenExpirationMs / 1000,
+            expiresIn = jwtProperties.accessTokenExpiration.toSeconds(),
+            refreshExpiresIn = jwtProperties.refreshTokenExpiration.toSeconds(),
         )
     }
+
 }

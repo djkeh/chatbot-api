@@ -1,4 +1,4 @@
-package me.uno.chatbotapi.common.security
+package me.uno.chatbotapi.config.security
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -42,5 +42,5 @@ class JwtAuthenticationFilter(
         }
         return null
     }
-}
 
+}

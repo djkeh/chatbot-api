@@ -1,39 +1,38 @@
-package me.uno.chatbotapi.common.security
+package me.uno.chatbotapi.config.security
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import me.uno.chatbotapi.domain.UserRole
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 import javax.crypto.SecretKey
 
 @Component
 class JwtProvider(
-    @Value("\${jwt.secret}") private val secretKeyString: String,
-    @Value("\${jwt.access-token-expiration-ms}") private val accessTokenExpirationMs: Long,
-    @Value("\${jwt.refresh-token-expiration-ms}") private val refreshTokenExpirationMs: Long,
+    private val jwtProperties: JwtProperties,
 ) {
-    private val key: SecretKey = Keys.hmacShaKeyFor(secretKeyString.toByteArray(StandardCharsets.UTF_8))
+    private val key: SecretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray(StandardCharsets.UTF_8))
 
     fun createAccessToken(email: String, role: UserRole): String {
-        return createToken(email, role, accessTokenExpirationMs)
+        return createToken(email, role, jwtProperties.accessTokenExpiration)
     }
 
     fun createRefreshToken(email: String, role: UserRole): String {
-        return createToken(email, role, refreshTokenExpirationMs)
+        return createToken(email, role, jwtProperties.refreshTokenExpiration)
     }
 
-    private fun createToken(email: String, role: UserRole, expirationMs: Long): String {
-        val now = Date()
-        val expiryDate = Date(now.time + expirationMs)
+    private fun createToken(email: String, role: UserRole, tokenExpiration: Duration): String {
+        val now = Instant.now()
+        val expiresAt = now.plus(tokenExpiration)
 
         return Jwts.builder()
             .subject(email)
             .claim("role", role.name)
-            .issuedAt(now)
-            .expiration(expiryDate)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expiresAt))
             .signWith(key)
             .compact()
     }
@@ -64,5 +63,5 @@ class JwtProvider(
             false
         }
     }
-}
 
+}
