@@ -1,10 +1,13 @@
 package me.uno.chatbotapi.adapter.inbound.web
 
-import me.uno.chatbotapi.adapter.inbound.web.dto.*
+import me.uno.chatbotapi.adapter.inbound.web.dto.LoginRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.LoginResponse
+import me.uno.chatbotapi.adapter.inbound.web.dto.RefreshRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.SignupRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.SignupResponse
 import me.uno.chatbotapi.application.port.inbound.LoginUseCase
 import me.uno.chatbotapi.application.port.inbound.SignupUseCase
 import me.uno.chatbotapi.application.port.inbound.TokenRefreshUseCase
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -19,18 +22,18 @@ class AuthController(
 ) {
 
     @PostMapping("/signup")
-    fun signup(@RequestBody request: SignupRequest): ResponseEntity<SignupResponse> {
-        return ResponseEntity.ok(signupUseCase.signup(request))
+    fun signup(@RequestBody request: SignupRequest): SignupResponse {
+        return signupUseCase.signup(request)
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): ResponseEntity<LoginResponse> {
-        return ResponseEntity.ok(loginUseCase.login(request))
+    fun login(@RequestBody request: LoginRequest): LoginResponse {
+        return loginUseCase.login(request)
     }
 
     @PostMapping("/refresh")
-    fun refresh(@RequestBody request: RefreshRequest): ResponseEntity<LoginResponse> {
-        return ResponseEntity.ok(tokenRefreshUseCase.refresh(request))
+    fun refresh(@RequestBody request: RefreshRequest): LoginResponse {
+        return tokenRefreshUseCase.refresh(request)
     }
 
 }
