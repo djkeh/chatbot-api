@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
 
-@Service
 @Transactional
+@Service
 class AuthService(
     private val loadUserPort: LoadUserPort,
     private val saveUserPort: SaveUserPort,
@@ -60,6 +60,7 @@ class AuthService(
         return createLoginResponse(user)
     }
 
+    @Transactional(readOnly = true)
     override fun refresh(request: RefreshRequest): LoginResponse {
         if (!jwtProvider.validateToken(request.refreshToken)) {
             throw IllegalArgumentException("Invalid refresh token")

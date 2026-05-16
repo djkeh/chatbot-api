@@ -65,4 +65,7 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs(
+        "--add-opens", "java.base/java.time=ALL-UNNAMED", // mockk, static mock을 위한 테스트 전용 설정
+    )
 }

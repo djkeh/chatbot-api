@@ -3,46 +3,38 @@ package me.uno.chatbotapi.adapter.inbound.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import me.uno.chatbotapi.adapter.inbound.web.dto.*
+import io.mockk.verify
+import me.uno.chatbotapi.adapter.inbound.web.dto.LoginRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.LoginResponse
+import me.uno.chatbotapi.adapter.inbound.web.dto.RefreshRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.SignupRequest
+import me.uno.chatbotapi.adapter.inbound.web.dto.SignupResponse
 import me.uno.chatbotapi.application.port.inbound.LoginUseCase
 import me.uno.chatbotapi.application.port.inbound.SignupUseCase
 import me.uno.chatbotapi.application.port.inbound.TokenRefreshUseCase
 import me.uno.chatbotapi.config.security.JwtProvider
 import me.uno.chatbotapi.domain.UserRole
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.assertj.MockMvcTester
 import java.time.OffsetDateTime
 
-@WebMvcTest(AuthController::class)
+@DisplayName("[Controller] 인증 컨트롤러 테스트")
 @AutoConfigureMockMvc(addFilters = false) // JWT 필터 제외하고 테스트
-@DisplayName("[WebMvc] AuthController Test")
-class AuthControllerTest {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @MockkBean
-    private lateinit var signupUseCase: SignupUseCase
-
-    @MockkBean
-    private lateinit var loginUseCase: LoginUseCase
-
-    @MockkBean
-    private lateinit var tokenRefreshUseCase: TokenRefreshUseCase
-
-    @MockkBean
-    private lateinit var jwtProvider: JwtProvider // AuthConfig 등에서 필요할 수 있음
+@WebMvcTest(AuthController::class)
+class AuthControllerTest @Autowired constructor(
+    private val mvc: MockMvcTester,
+    private val objectMapper: ObjectMapper,
+    @MockkBean private val signupUseCase: SignupUseCase,
+    @MockkBean private val loginUseCase: LoginUseCase,
+    @MockkBean private val tokenRefreshUseCase: TokenRefreshUseCase,
+    @MockkBean private val jwtProvider: JwtProvider,
+) {
 
     @Test
     fun `회원가입을 요청하면, 성공 응답을 반환한다`() {
@@ -52,15 +44,24 @@ class AuthControllerTest {
         every { signupUseCase.signup(any()) } returns response
 
         // When & Then
-        mockMvc.perform(
-            post("/api/v1/auth/signup")
+        assertThat(
+            mvc.post()
+                .uri("/api/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.email").value(response.email))
-            .andExpect(jsonPath("$.name").value(response.name))
-            .andExpect(jsonPath("$.role").value("MEMBER"))
+            .hasStatusOk()
+            .bodyJson()
+            .isLenientlyEqualTo(
+                """
+                {
+                    "email": "${response.email}",
+                    "name": "${response.name}",
+                    "role": "${UserRole.MEMBER}"
+                }
+                """.trimIndent()
+            )
+        verify { signupUseCase.signup(any()) }
     }
 
     @Test
@@ -71,14 +72,48 @@ class AuthControllerTest {
         every { loginUseCase.login(any()) } returns response
 
         // When & Then
-        mockMvc.perform(
-            post("/api/v1/auth/login")
+        assertThat(
+            mvc.post()
+                .uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.accessToken").value("access"))
-            .andExpect(jsonPath("$.refreshToken").value("refresh"))
+            .hasStatusOk()
+            .bodyJson()
+            .isLenientlyEqualTo(
+                """
+                {
+                    "accessToken": "access",
+                    "refreshToken": "refresh"
+                }
+                """.trimIndent()
+            )
+        verify { loginUseCase.login(any()) }
+    }
+
+    @Test
+    fun `토큰 갱신을 요청하면, 새로운 토큰 정보를 반환한다`() {
+        // Given
+        val request = RefreshRequest("refresh-token")
+        val response = LoginResponse("new-access", "new-refresh", "Bearer", 300, 86400)
+        every { tokenRefreshUseCase.refresh(any()) } returns response
+
+        // When & Then
+        assertThat(
+            mvc.post()
+                .uri("/api/v1/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .hasStatusOk()
+            .bodyJson()
+            .isLenientlyEqualTo("""
+                {
+                    "accessToken": "new-access",
+                    "refreshToken": "new-refresh"
+                }
+            """)
+        verify { tokenRefreshUseCase.refresh(any()) }
     }
 
 }

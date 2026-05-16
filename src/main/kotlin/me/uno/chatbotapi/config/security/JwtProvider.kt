@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import javax.crypto.SecretKey
 
 @Component
@@ -38,30 +38,31 @@ class JwtProvider(
     }
 
     fun getEmailFromToken(token: String): String {
-        return Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(token)
+        return parseSignedClaims(token)
             .payload
             .subject
     }
 
     fun getRoleFromToken(token: String): UserRole {
-        val roleString = Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(token)
-            .payload["role"] as String
-        return UserRole.valueOf(roleString)
+        val roleString = parseSignedClaims(token).payload["role"] as? String
+            ?: throw IllegalArgumentException("Invalid role claim")
+
+        return runCatching { UserRole.valueOf(roleString) }
+            .getOrElse { throw IllegalArgumentException("Invalid role claim", it) }
     }
 
     fun validateToken(token: String): Boolean {
         return try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token)
+            parseSignedClaims(token)
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
+
+    private fun parseSignedClaims(token: String) = Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
 
 }
